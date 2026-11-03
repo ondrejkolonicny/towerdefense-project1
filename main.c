@@ -30,12 +30,28 @@ typedef struct
 {
     SDL_Rect rect;
     bool is_placing_tower;
+
 } Button;
+
+typedef struct
+{
+    int x;
+    int y;
+    int size;
+    int radius;
+    int attack_rate;
+    int cost;
+
+} Tower;
 
 void init_map(Tile map[ROWS][COLS]);
 void draw_map(SDL_Renderer *renderer, Tile map[ROWS][COLS]);
 void fill_tile(SDL_Renderer *renderer, int row, int col, int size);
 void place_tower(SDL_Point mouse_coords, Button *tower_button, Tile map[ROWS][COLS]);
+void add_tower_to_towers(SDL_Point tower_tile);
+void draw_towers();
+void draw_enemies();
+void draw_tower_projectiles();
 
 int main()
 {
@@ -47,7 +63,7 @@ int main()
         100,
         WINDOW_WIDTH,
         WINDOW_HEIGHT,
-        SDL_WINDOW_SHOWN
+        SDL_WINDOW_SHOWN // idk asi ze jde videt
 
     );
 
@@ -58,6 +74,8 @@ int main()
 
     Tile map[ROWS][COLS];
     init_map(map);
+
+    Tower towers[ROWS * COLS];
 
     Uint64 now, last;
 
@@ -154,7 +172,7 @@ void draw_map(SDL_Renderer *renderer, Tile map[ROWS][COLS])
 
     for (int i = 0; i < ROWS; i++)
     {
-        for (int j = 0; j < COLS; j++)
+        for (int j = 0; j < COLS; j++) // musi se pak na konci predelat na textury, asi funkce na prirazeni jednotlivych textur jeste do tehle
         {
             if (map[i][j].type == TYPE_GRASS)
             {
@@ -191,17 +209,27 @@ void fill_tile(SDL_Renderer *renderer, int row, int col, int size)
     SDL_RenderFillRect(renderer, &current_tile);
 }
 
-// turns off placing tower button and then changes the pressed tile value of has tower to true if placable == true
+// if placable == true turns off placing tower button and then changes the pressed tile value of has tower to true
 void place_tower(SDL_Point mouse_coords, Button *tower_button, Tile map[ROWS][COLS])
 {
-    int tower_tile_col = mouse_coords.x / TILE_SIZE;
-    int tower_tile_row = mouse_coords.y / TILE_SIZE;
+    SDL_Point tower_tile;
 
-    if (map[tower_tile_row][tower_tile_col].is_buildable && !map[tower_tile_row][tower_tile_col].has_tower)
+    tower_tile.x = mouse_coords.x / TILE_SIZE; // columns
+    tower_tile.y = mouse_coords.y / TILE_SIZE; // rows
+
+    if (map[tower_tile.y][tower_tile.x].is_buildable && !map[tower_tile.y][tower_tile.x].has_tower)
     {
-        map[tower_tile_row][tower_tile_col].has_tower = true;
+        map[tower_tile.y][tower_tile.x].has_tower = true;
         tower_button->is_placing_tower = false;
+        // add_tower_to_towers(tower_tile, );
     }
 
-    printf("%d\n%d\n", tower_tile_row, tower_tile_col);
+    printf("%d\n%d\n", tower_tile.x, tower_tile.y);
+    printf("%d\n", map[tower_tile.y][tower_tile.x].has_tower);
 }
+
+// adds  tower to towers and sets its values
+// void add_tower_to_towers(SDL_Point tower_tile)
+// {
+
+// }
